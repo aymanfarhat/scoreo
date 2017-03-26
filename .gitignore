@@ -1,2 +1,4 @@
 scoreo.db
+scoreo_test.db
 .eggs/
+__pycache__/
