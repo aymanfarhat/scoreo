@@ -1,1 +1,0 @@
-from .scoreo import app
