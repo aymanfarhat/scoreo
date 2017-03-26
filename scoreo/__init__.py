@@ -12,4 +12,5 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-import scoreo.views  # noqa
+
+import scoreo.views, scoreo.commands  # noqa
