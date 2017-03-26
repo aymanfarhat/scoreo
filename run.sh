@@ -1,1 +1,0 @@
-python ./scoreo/scoreo.py
