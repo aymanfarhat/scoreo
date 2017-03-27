@@ -1,6 +1,8 @@
 import os
 import flask
 from flask_sqlalchemy import SQLAlchemy
+import uuid
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE_URI = 'sqlite:///' + os.path.join(basedir, '..', 'tmp_db/app.db')
@@ -11,6 +13,5 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
 
 import scoreo.views, scoreo.commands  # noqa
