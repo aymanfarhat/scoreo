@@ -1,7 +1,9 @@
 import uuid
 from datetime import datetime
-from scoreo import db
+from flask_sqlalchemy import SQLAlchemy
 
+
+db = SQLAlchemy()
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -66,3 +68,7 @@ class Game(db.Model):
 
     def __repr__(self):
         return '<Game %r>' % self.slug
+
+    @classmethod
+    def find_by_slug_secret(cls, game_id, game_secret):
+        return None
