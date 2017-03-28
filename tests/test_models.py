@@ -1,6 +1,7 @@
 import time
-import flask
 from unittest import TestCase
+import flask
+from sqlalchemy.exc import IntegrityError 
 from scoreo import models
 from scoreo import create_test_app
 
@@ -19,13 +20,27 @@ class GameTest(TestCase):
         with self.app.app_context():
             self.db.drop_all()
 
-    def test_creation(self):
-        game = models.Game('nba')
-
+    def test_create(self):
         with self.app.app_context():
-            self.db.session.add(game)
-            self.db.session.commit()
+            game = models.Game.create('nunu')
 
-            target_game = self.db.session.query(models.Game).filter(models.Game.slug == 'nba').first()
+            target_game = self.db.session.query(models.Game) \
+                            .filter(models.Game.slug == 'nunu').first()
 
-            assert game == target_game
+            self.assertEqual(game, (target_game.slug, target_game.secret))
+
+            with self.assertRaises(IntegrityError):
+                models.Game.create('nunu')
+
+
+    def test_first_or_create(self):
+        with self.app.app_context():
+            ngame = models.Game.first_or_create('nunu')
+            game2 = models.Game.first_or_create('nunu')
+
+            self.assertEqual(ngame, game2)
+
+            ngame = models.Game.first_or_create('ayman')
+            game2 = models.Game.first_or_create('freddy')
+
+            self.assertNotEqual(ngame, game2)

@@ -60,15 +60,32 @@ class Board(db.Model):
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     slug = db.Column(db.String(80), unique=True, nullable=False)
-    secret = db.Column(db.String(80), unique=True, default=str(uuid.uuid1()), nullable=False)
+    secret = db.Column(db.String(80), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     def __init__(self, slug):
         self.slug = slug
+        self.secret = str(uuid.uuid1())
 
     def __repr__(self):
         return '<Game %r>' % self.slug
 
     @classmethod
-    def find_by_slug_secret(cls, game_id, game_secret):
-        return None
+    def create(cls, slug):
+        game = cls(slug)
+
+        db.session.add(game)
+        db.session.commit()
+
+        return (game.slug, game.secret)
+
+    @classmethod
+    def first_or_create(cls, slug):
+        game = cls.query.filter_by(slug = slug).first()
+
+        if game is not None:
+            result = (game.slug, game.secret)
+        else:
+            result = cls.create(slug)
+
+        return result 
