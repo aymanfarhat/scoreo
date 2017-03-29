@@ -31,6 +31,10 @@ class Player(db.Model):
 
         return result 
 
+    @classmethod
+    def find_by_fbid(cls, fb_id):
+        return cls.query.filter(cls.fb_id == fb_id).first()
+
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,6 +55,11 @@ class Score(db.Model):
 
     def __repr__(self):
         return '<Score %r>' % self.value
+
+    @classmethod
+    def insert(cls, value, player, board):
+        score = cls(value, player, board)
+        return score
 
 
 class Board(db.Model):

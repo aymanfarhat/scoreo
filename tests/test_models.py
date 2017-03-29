@@ -2,6 +2,7 @@ import time
 from unittest import TestCase
 import flask
 from sqlalchemy.exc import IntegrityError 
+from sqlalchemy import and_
 from scoreo import models
 from scoreo import create_test_app
 
@@ -99,3 +100,72 @@ class PlayerTest(TestCase):
                         .filter(models.Player.fb_id == player.fb_id).count()
 
             self.assertEqual(1, countplayer)
+
+    def test_find_by_fbid(self):
+        with self.app.app_context():
+            player = models.Player.find_by_fbid('9999')
+
+            self.assertIsNone(player)
+
+            player = models.Player.first_or_create('Ayman', '9999')
+
+            self.assertIsNotNone(player)
+            self.assertEqual('9999', player.fb_id)
+
+
+class ScoreTest(TestCase):
+    def setUp(self):
+        self.db = models.db
+
+        self.app = create_test_app()
+        self.db.init_app(self.app)
+
+        with self.app.app_context():
+            self.db.create_all()
+
+    def tearDown(self):
+        with self.app.app_context():
+            self.db.drop_all()
+
+    def test_log_player_scores(self):
+        """Validate the logging of scores and their relations"""
+        with self.app.app_context():
+            # Setup a new game with a board and a player
+            game = models.Game.first_or_create('nunu')
+            board = models.Board.first_or_create('top10', game)
+            board2 = models.Board.first_or_create('top30', game)
+            player = models.Player.first_or_create('Ayman', '2334')
+            player2 = models.Player.first_or_create('Armando', '1337')
+
+            self.assertNotEqual(player, player2)
+
+            # Log scores for player
+            models.Score.insert(36, player, board)
+            models.Score.insert(29, player, board)
+            models.Score.insert(45, player, board)
+            models.Score.insert(4000, player2, board)
+            models.Score.insert(100, player, board2)
+            models.Score.insert(5000, player, board2)
+
+            all_player_scores = self.db.session.query(models.Score.value) \
+                                    .filter_by(player_id=player.id) \
+                                    .all()
+
+            self.assertEqual([(36,), (29,), (45,), (100,), (5000,)], all_player_scores)
+
+            board_scores = self.db.session.query(models.Score.value) \
+                            .filter_by(player_id=player.id) \
+                            .filter_by(board_id=board.id) \
+                            .all()
+
+            self.assertEqual([(36,), (29,), (45,)], board_scores)
+
+
+    def test_list_player_board_scores(self):
+        """Validate the listing of scores in a board by a player"""
+        pass
+
+    def test_list_board_top_player_scores(self):
+        """Validate the listing of top n players in a board"""
+        pass
+
