@@ -11,12 +11,25 @@ class Player(db.Model):
     fb_id = db.Column(db.String(80), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    def __init__(self, fb_id, name):
+    def __init__(self, name, fb_id):
         self.fb_id = fb_id
         self.name = name
 
     def __repr__(self):
         return '<Player %r>' % self.name
+
+    @classmethod
+    def first_or_create(cls, name, fb_id):
+        player = cls.query.filter(cls.fb_id == fb_id).first()
+
+        if player is not None:
+            result = player
+        else:
+            result = cls(name, fb_id)
+            db.session.add(result)
+            db.session.commit()
+
+        return result 
 
 
 class Score(db.Model):
@@ -51,10 +64,31 @@ class Board(db.Model):
 
     def __init__(self, slug, game):
         self.slug = slug
+        self.game_id = game.id
         self.game = game
 
     def __repr__(self):
         return '<Board %r>' % self.slug
+
+    @classmethod
+    def create(cls, slug, game):
+        board = cls(slug, game)
+
+        db.session.add(board)
+        db.session.commit()
+
+        return board
+
+    @classmethod
+    def first_or_create(cls, slug, game):
+        board = cls.query.filter(cls.slug == slug and cls.game == game).first()
+
+        if board is not None:
+            result = board
+        else:
+            result = cls.create(slug, game)
+
+        return result 
 
 
 class Game(db.Model):
@@ -77,14 +111,14 @@ class Game(db.Model):
         db.session.add(game)
         db.session.commit()
 
-        return (game.slug, game.secret)
+        return game
 
     @classmethod
     def first_or_create(cls, slug):
         game = cls.query.filter_by(slug = slug).first()
 
         if game is not None:
-            result = (game.slug, game.secret)
+            result = game
         else:
             result = cls.create(slug)
 
