@@ -75,6 +75,30 @@ class BoardTest(TestCase):
 
             self.assertNotEqual(board2, board3)
 
+    def test_find_by_slug(self):
+        pass
+
+    def test_get_user_scores_by_board((self):
+        """Validate the listing of scores in a board by a player"""
+            game = models.Game.first_or_create('nunu')
+            mode1_board = models.Board.first_or_create('mode1', game)
+            player = models.Player.first_or_create('Ayman', '2334')
+
+            models.Score.insert(360, player, mode1_board)
+            models.Score.insert(380, player, mode1_board)
+            models.Score.insert(400, player, mode1_board)
+            models.Score.insert(600, player, mode1_board)
+            models.Score.insert(23, player, mode1_board)
+            models.Score.insert(5000, player, mode1_board)    
+
+            #score_list = models.
+        pass
+
+    def test_get_board_topn_scores(self):
+        """Validate the listing of top n players in a board"""
+        pass
+
+
 class PlayerTest(TestCase):
     def setUp(self):
         self.db = models.db
@@ -159,13 +183,3 @@ class ScoreTest(TestCase):
                             .all()
 
             self.assertEqual([(36,), (29,), (45,)], board_scores)
-
-
-    def test_list_player_board_scores(self):
-        """Validate the listing of scores in a board by a player"""
-        pass
-
-    def test_list_board_top_player_scores(self):
-        """Validate the listing of top n players in a board"""
-        pass
-

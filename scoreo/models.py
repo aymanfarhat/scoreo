@@ -99,6 +99,22 @@ class Board(db.Model):
 
         return result 
 
+    @classmethod
+    def find_by_slug(cls):
+        pass
+
+    @classmethod
+    def get_user_scores(cls, user_id, limit=10, sort_by='date', sort_order='DESC'):
+        """List of scores history by a user on a board
+        returns a list of scores with datetime for each entry
+        """
+        pass
+
+    @classmethod
+    def get_board_topn_scores(cls, slug, limit=10, sort_order='DESC'):
+        """Returns top n scores by a board id"""
+    pass
+
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
