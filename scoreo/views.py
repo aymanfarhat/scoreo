@@ -39,13 +39,56 @@ def add_score():
         
         score = Score.insert(int(data['score_value']), player, board)
 
-        reply = flask.jsonify('success', {
+        reply = compose_reply('success', {
             'score': score.value,
             'board': board.slug,
             'game': game.slug, 
             'player': {'name': player.name, 'fb_id': player.fb_id},
-            'created_at': score.create_at
-            })
+            'created_at': score.created_at
+        })
+    else:
+        reply = compose_reply('error', 'Game does not exist')
+
+
+    return flask.jsonify(reply)
+
+
+@app.route('/leaderboard/<game_slug>/<board_slug>')
+def get_board(game_slug, board_slug):
+    game = Game.find_by_slug(game_slug)
+
+    reply = {}
+
+    if game is not None:
+        board = Board.first_or_create(board_slug, game)
+
+        board_data = board.get_topn_scores()
+
+        reply = compose_reply('success', board_data)
+    else:
+        reply = compose_reply('error', 'Game does not exist')
+
+    return flask.jsonify(reply)
+
+
+@app.route('/playerboard/<game_slug>/<board_slug>/<fb_id>')
+def playerboard(game_slug, board_slug, fb_id):
+    player = Player.find_by_fbid(fb_id)
+
+    game = Game.find_by_slug(game_slug)
+
+    reply = {}
+
+    if game is not None:
+        board = Board.first_or_create(board_slug, game)
+
+        if player is not None:
+            board_data = board.get_board_scores_by_player(player.id)
+
+            reply = compose_reply('success', board_data)
+        else:
+            reply = compose_reply('error', 'Player does not exist')
+
     else:
         reply = compose_reply('error', 'Game does not exist')
 

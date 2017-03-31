@@ -12,7 +12,7 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     fb_id = db.Column(db.String(80), unique=True, nullable=False)
-    fb_access_token = db.Column(db.String(250), unique=True, nullable=False)
+    fb_access_token = db.Column(db.String(300), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     def __init__(self, name, fb_id, token):
@@ -49,7 +49,9 @@ class Player(db.Model):
 
         r = requests.get('https://graph.facebook.com/me', params=playload)
 
-        player = cls.first_or_create(r['name'], r['id'], access_token)
+        reply_data = r.json()
+
+        player = cls.first_or_create(reply_data['name'], reply_data['id'], access_token)
 
         return player
 
@@ -123,7 +125,6 @@ class Board(db.Model):
             result = cls.create(slug, game)
 
         return result 
-
 
     def get_board_scores_by_player(self, player_id, limit=10, sort_by=Score.value, sort_order='DESC'):
         """List of scores history by a user on a board
