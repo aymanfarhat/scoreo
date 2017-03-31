@@ -11,6 +11,7 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     fb_id = db.Column(db.String(80), unique=True, nullable=False)
+    fb_access_token = db.Column(db.String(120), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     def __init__(self, name, fb_id):
@@ -146,7 +147,6 @@ class Board(db.Model):
                         .limit(limit) \
                         .all()
 
-        #print([{'score': r[0], 'player_name': r[2], 'player_fbid': r[3]} for r in board_scores])
         return [{'score': r[0], 'created_at': r[1], 'player_name': r[2], 'player_fbid': r[3]} for r in board_scores]
 
 
