@@ -48,6 +48,20 @@ class GameTest(TestCase):
             self.assertNotEqual(ngame, game2)
 
 
+    def test_get_board_by_slug(self):
+        with self.app.app_context():
+            game = models.Game.first_or_create('nana') 
+
+            self.assertIsNone(game.get_board_by_slug('b1'))
+
+            board = models.Board.first_or_create('b1', game)
+
+            board_query = game.get_board_by_slug('b1')
+
+            self.assertIsNotNone(board_query)
+            self.assertEqual('b1', board_query.slug)
+
+
 class BoardTest(TestCase):
     def setUp(self):
         self.db = models.db
@@ -76,8 +90,7 @@ class BoardTest(TestCase):
 
             self.assertNotEqual(board2, board3)
 
-    def test_find_by_slug(self):
-        pass
+
 
     def test_get_board_scores_by_player(self):
         with self.app.app_context():

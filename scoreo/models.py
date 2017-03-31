@@ -108,7 +108,7 @@ class Board(db.Model):
         return result 
 
     @classmethod
-    def find_by_slug(cls):
+    def find_by_slug(cls, slug, game):
         pass
 
     def get_board_scores_by_player(self, player_id, limit=10, sort_by=Score.value, sort_order='DESC'):
@@ -169,3 +169,6 @@ class Game(db.Model):
             result = cls.create(slug)
 
         return result 
+
+    def get_board_by_slug(self, board_slug):
+        return self.boards.filter_by(slug=board_slug).first()
