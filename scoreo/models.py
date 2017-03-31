@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+import requests
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import asc, desc
 from sqlalchemy import func
@@ -11,24 +12,25 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     fb_id = db.Column(db.String(80), unique=True, nullable=False)
-    fb_access_token = db.Column(db.String(120), unique=True, nullable=False)
+    fb_access_token = db.Column(db.String(250), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    def __init__(self, name, fb_id):
+    def __init__(self, name, fb_id, token):
         self.fb_id = fb_id
         self.name = name
+        self.fb_access_token = token
 
     def __repr__(self):
         return '<Player %r>' % self.name
 
     @classmethod
-    def first_or_create(cls, name, fb_id):
+    def first_or_create(cls, name, fb_id, token):
         player = cls.query.filter(cls.fb_id == fb_id).first()
 
         if player is not None:
             result = player
         else:
-            result = cls(name, fb_id)
+            result = cls(name, fb_id, token)
             db.session.add(result)
             db.session.commit()
 
@@ -37,6 +39,19 @@ class Player(db.Model):
     @classmethod
     def find_by_fbid(cls, fb_id):
         return cls.query.filter(cls.fb_id == fb_id).first()
+
+    @classmethod
+    def create_by_access_token(cls, access_token):
+        playload = {
+            'access_token': access_token,
+            'fields': 'id,name' 
+        }
+
+        r = requests.get('https://graph.facebook.com/me', params=playload)
+
+        player = cls.first_or_create(r['name'], r['id'], access_token)
+
+        return player
 
 
 class Score(db.Model):
@@ -185,3 +200,7 @@ class Game(db.Model):
 
     def get_board_by_slug(self, board_slug):
         return self.boards.filter_by(slug=board_slug).first()
+
+    @classmethod
+    def find_by_slug(cls, slug):
+        return cls.query.filter(cls.slug == slug).first()

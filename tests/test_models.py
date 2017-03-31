@@ -1,4 +1,5 @@
 import time
+import uuid
 from datetime import datetime
 from unittest import TestCase
 import flask
@@ -97,7 +98,7 @@ class BoardTest(TestCase):
             """Validate the listing of scores in a board by a player"""
             game = models.Game.first_or_create('nunu')
             mode1_board = models.Board.first_or_create('mode1', game)
-            player = models.Player.first_or_create('Ayman', '2334')
+            player = models.Player.first_or_create('Ayman', '2334', uuid.uuid1())
 
             dummy_datetime = datetime(2017, 3, 31, 8, 59, 2, 0)
 
@@ -141,9 +142,9 @@ class BoardTest(TestCase):
             mode1_board = models.Board.first_or_create('mode1', game)
             mode2_board = models.Board.first_or_create('mode2', game)
 
-            player1 = models.Player.first_or_create('Ayman', '2334')
-            player2 = models.Player.first_or_create('Tony', '2335')
-            player3 = models.Player.first_or_create('Armando', '2336')
+            player1 = models.Player.first_or_create('Ayman', '2334', uuid.uuid1())
+            player2 = models.Player.first_or_create('Tony', '2335', uuid.uuid1())
+            player3 = models.Player.first_or_create('Armando', '2336', uuid.uuid1())
 
             dummy_datetime = datetime(2017, 3, 31, 8, 59, 2, 0)
 
@@ -194,8 +195,8 @@ class PlayerTest(TestCase):
 
     def test_first_or_create(self):
         with self.app.app_context():
-            player = models.Player.first_or_create('ayman', '1234')
-            player1 = models.Player.first_or_create('ayman', '1234')
+            player = models.Player.first_or_create('ayman', '1234', uuid.uuid1())
+            player1 = models.Player.first_or_create('ayman', '1234', uuid.uuid1())
 
             self.assertEqual(player, player1)
 
@@ -210,7 +211,7 @@ class PlayerTest(TestCase):
 
             self.assertIsNone(player)
 
-            player = models.Player.first_or_create('Ayman', '9999')
+            player = models.Player.first_or_create('Ayman', '9999', uuid.uuid1())
 
             self.assertIsNotNone(player)
             self.assertEqual('9999', player.fb_id)
@@ -237,8 +238,8 @@ class ScoreTest(TestCase):
             game = models.Game.first_or_create('nunu')
             board = models.Board.first_or_create('top10', game)
             board2 = models.Board.first_or_create('top30', game)
-            player = models.Player.first_or_create('Ayman', '2334')
-            player2 = models.Player.first_or_create('Armando', '1337')
+            player = models.Player.first_or_create('Ayman', '2334', uuid.uuid1())
+            player2 = models.Player.first_or_create('Armando', '1337', uuid.uuid1())
 
             self.assertNotEqual(player, player2)
 
