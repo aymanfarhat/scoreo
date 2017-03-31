@@ -135,7 +135,47 @@ class BoardTest(TestCase):
 
     def test_get_board_topn_scores(self):
         """Validate the listing of top n players in a board"""
-        pass
+
+        with self.app.app_context():
+            game = models.Game.first_or_create('nunu')
+            mode1_board = models.Board.first_or_create('mode1', game)
+            mode2_board = models.Board.first_or_create('mode2', game)
+
+            player1 = models.Player.first_or_create('Ayman', '2334')
+            player2 = models.Player.first_or_create('Tony', '2335')
+            player3 = models.Player.first_or_create('Armando', '2336')
+
+            dummy_datetime = datetime(2017, 3, 31, 8, 59, 2, 0)
+
+            models.Score.insert(360, player3, mode1_board, dummy_datetime)
+            models.Score.insert(380, player3, mode1_board, dummy_datetime)
+            models.Score.insert(400, player2, mode1_board, dummy_datetime)
+            models.Score.insert(600, player2, mode1_board, dummy_datetime)
+            models.Score.insert(23, player2, mode1_board, dummy_datetime)
+            models.Score.insert(5000, player1, mode1_board, dummy_datetime)
+            models.Score.insert(1, player1, mode1_board, dummy_datetime)
+            models.Score.insert(2, player1, mode1_board, dummy_datetime)
+            models.Score.insert(3, player1, mode1_board, dummy_datetime)
+            models.Score.insert(4, player2, mode1_board, dummy_datetime)
+            models.Score.insert(5, player1, mode1_board, dummy_datetime)
+            models.Score.insert(5, player1, mode2_board, dummy_datetime)
+            models.Score.insert(5, player1, mode2_board, dummy_datetime)
+            models.Score.insert(5, player1, mode2_board, dummy_datetime)
+            models.Score.insert(5, player1, mode2_board, dummy_datetime)
+
+            expected_score_list = [
+                    { 'score': 5000, 'created_at': dummy_datetime, 'player_fbid': '2334', 'player_name': 'Ayman'},
+                    { 'score': 600, 'created_at': dummy_datetime, 'player_fbid': '2335', 'player_name': 'Tony'},
+                    { 'score': 380, 'created_at': dummy_datetime, 'player_fbid': '2336', 'player_name': 'Armando'},
+            ] 
+
+            top4 = mode1_board.get_topn_scores(10)
+
+            self.assertEqual(expected_score_list, top4)
+
+            topn = mode2_board.get_topn_scores(4)
+
+            self.assertEqual(1, len(topn))
 
 
 class PlayerTest(TestCase):

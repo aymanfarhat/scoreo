@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import asc, desc
+from sqlalchemy import func
 
 
 db = SQLAlchemy()
@@ -107,9 +108,6 @@ class Board(db.Model):
 
         return result 
 
-    @classmethod
-    def find_by_slug(cls, slug, game):
-        pass
 
     def get_board_scores_by_player(self, player_id, limit=10, sort_by=Score.value, sort_order='DESC'):
         """List of scores history by a user on a board
@@ -131,10 +129,25 @@ class Board(db.Model):
         return [{'score': r[0], 'created_at': r[1]} for r in board_scores]
 
 
-    @classmethod
-    def get_board_topn_scores(cls, slug, limit=10, sort_order='DESC'):
+    def get_topn_scores(self, limit=10, sort_order='DESC'):
         """Returns top n scores by a board id"""
-    pass
+
+        sort_funcs = {
+            'DESC': desc,
+            'ASC': asc
+        }
+
+        board_scores = db.session.query(func.max(Score.value), Score.created_at, Player.name, Player.fb_id) \
+                        .filter_by(board_id=self.id) \
+                        .join(Player) \
+                        .order_by(sort_funcs[sort_order](Score.value)) \
+                        .distinct(Player.id) \
+                        .group_by(Player.name) \
+                        .limit(limit) \
+                        .all()
+
+        #print([{'score': r[0], 'player_name': r[2], 'player_fbid': r[3]} for r in board_scores])
+        return [{'score': r[0], 'created_at': r[1], 'player_name': r[2], 'player_fbid': r[3]} for r in board_scores]
 
 
 class Game(db.Model):
