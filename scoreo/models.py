@@ -104,7 +104,7 @@ class Board(db.Model):
         pass
 
     @classmethod
-    def get_user_scores(cls, user_id, limit=10, sort_by='date', sort_order='DESC'):
+    def get_board_scores_by_player(cls, player_id, limit=10, sort_by='date', sort_order='DESC'):
         """List of scores history by a user on a board
         returns a list of scores with datetime for each entry
         """
