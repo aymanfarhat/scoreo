@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from unittest import TestCase
 import flask
 from sqlalchemy.exc import IntegrityError 
@@ -85,19 +86,39 @@ class BoardTest(TestCase):
             mode1_board = models.Board.first_or_create('mode1', game)
             player = models.Player.first_or_create('Ayman', '2334')
 
-            models.Score.insert(360, player, mode1_board)
-            models.Score.insert(380, player, mode1_board)
-            models.Score.insert(400, player, mode1_board)
-            models.Score.insert(600, player, mode1_board)
-            models.Score.insert(23, player, mode1_board)
-            models.Score.insert(5000, player, mode1_board)    
+            dummy_datetime = datetime(2017, 3, 31, 8, 59, 2, 0)
 
-            score_list = models.Board.get_board_scores_by_player(player.id)
-            expected_score_list = [] 
+            models.Score.insert(360, player, mode1_board, dummy_datetime)
+            models.Score.insert(380, player, mode1_board, dummy_datetime)
+            models.Score.insert(400, player, mode1_board, dummy_datetime)
+            models.Score.insert(600, player, mode1_board, dummy_datetime)
+            models.Score.insert(23, player, mode1_board, dummy_datetime)
+            models.Score.insert(5000, player, mode1_board, dummy_datetime)
+            models.Score.insert(1, player, mode1_board, dummy_datetime)
+            models.Score.insert(2, player, mode1_board, dummy_datetime)
+            models.Score.insert(3, player, mode1_board, dummy_datetime)
+            models.Score.insert(4, player, mode1_board, dummy_datetime)
+            models.Score.insert(5, player, mode1_board, dummy_datetime)
 
-            #self.assertEqual()
+            score_list = mode1_board.get_board_scores_by_player(player.id)
 
-            pass
+            expected_score_list = [
+                    { 'score': 5000, 'created_at': dummy_datetime},
+                    { 'score': 600, 'created_at': dummy_datetime},
+                    { 'score': 400, 'created_at': dummy_datetime},
+                    { 'score': 380, 'created_at': dummy_datetime},
+                    { 'score': 360, 'created_at': dummy_datetime},
+                    { 'score': 23, 'created_at': dummy_datetime},
+                    { 'score': 5, 'created_at': dummy_datetime},
+                    { 'score': 4, 'created_at': dummy_datetime},
+                    { 'score': 3, 'created_at': dummy_datetime},
+                    { 'score': 2, 'created_at': dummy_datetime},
+            ] 
+
+            self.assertEqual(len(expected_score_list), len(score_list))
+
+            self.assertEqual(expected_score_list, score_list)
+
 
     def test_get_board_topn_scores(self):
         """Validate the listing of top n players in a board"""

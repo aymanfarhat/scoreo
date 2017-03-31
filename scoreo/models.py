@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import asc, desc
 
 
 db = SQLAlchemy()
@@ -48,17 +49,24 @@ class Score(db.Model):
     board = db.relationship('Board',
                     backref=db.backref('scores', lazy='dynamic'))
 
-    def __init__(self, value, player, board):
+    def __init__(self, value, player, board, created_at='now'):
         self.value = value
         self.player = player
         self.board = board
+
+        if created_at != 'now':
+            self.created_at = created_at
 
     def __repr__(self):
         return '<Score %r>' % self.value
 
     @classmethod
-    def insert(cls, value, player, board):
-        score = cls(value, player, board)
+    def insert(cls, value, player, board, created_at='now'):
+        score = cls(value, player, board, created_at)
+
+        db.session.add(score)
+        db.session.commit()
+
         return score
 
 
@@ -103,12 +111,25 @@ class Board(db.Model):
     def find_by_slug(cls):
         pass
 
-    @classmethod
-    def get_board_scores_by_player(cls, player_id, limit=10, sort_by='date', sort_order='DESC'):
+    def get_board_scores_by_player(self, player_id, limit=10, sort_by=Score.value, sort_order='DESC'):
         """List of scores history by a user on a board
         returns a list of scores with datetime for each entry
         """
-        pass
+
+        sort_funcs = {
+            'DESC': desc,
+            'ASC': asc
+        }
+
+        board_scores = db.session.query(Score.value, Score.created_at) \
+                        .filter_by(player_id=player_id) \
+                        .filter_by(board_id=self.id) \
+                        .order_by(sort_funcs[sort_order](sort_by)) \
+                        .limit(limit) \
+                        .all()
+
+        return [{'score': r[0], 'created_at': r[1]} for r in board_scores]
+
 
     @classmethod
     def get_board_topn_scores(cls, slug, limit=10, sort_order='DESC'):
