@@ -9,6 +9,10 @@ def compose_reply(status='success', data=''):
         'data': data
     }
 
+@app.route('/')
+def index():
+    return 'It runs!'
+
 @app.route('/score/add', methods=['POST'])
 def add_score():
     """Add a new score, user should supply:
