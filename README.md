@@ -13,6 +13,7 @@ After generating the new migration, run `flask db upgrade` to apply the migratio
 
 If a migrations folder does not exist this means the database is not yet initialised. run `flask db init` then migrate it upgrade.
 
-To run on gunicorn: `Run via gunicorn --bind 0.0.0.0:5000 wsgi:app`
+To run on gunicorn: Run via `gunicorn --bind 0.0.0.0:5000 wsgi:app`
 
-Also make sure to create an upstart script for gunicorn on ubuntu, reference: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-14-04
+Also make sure to create an upstart script for gunicorn on ubuntu, reference: 
+https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-16-04
