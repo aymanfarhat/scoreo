@@ -12,3 +12,5 @@ After updating the models file for the database scheme run: `flask db migrate` t
 After generating the new migration, run `flask db upgrade` to apply the migration.
 
 If a migrations folder does not exist this means the database is not yet initialised. run `flask db init` then migrate it upgrade.
+
+To run on gunicorn: `Run via gunicorn --bind 0.0.0.0:5000 wsgi:app`

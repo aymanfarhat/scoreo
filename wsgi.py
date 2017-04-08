@@ -1,0 +1,1 @@
+from scoreo import app
