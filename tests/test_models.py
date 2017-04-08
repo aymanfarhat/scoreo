@@ -6,14 +6,14 @@ import flask
 from sqlalchemy.exc import IntegrityError 
 from sqlalchemy import and_
 from scoreo import models
-from scoreo import create_test_app
+from scoreo import create_app
 
 
 class GameTest(TestCase):
     def setUp(self):
         self.db = models.db
 
-        self.app = create_test_app()
+        self.app = create_app('test')
         self.db.init_app(self.app)
 
         with self.app.app_context():
@@ -67,7 +67,7 @@ class BoardTest(TestCase):
     def setUp(self):
         self.db = models.db
 
-        self.app = create_test_app()
+        self.app = create_app('test')
         self.db.init_app(self.app)
 
         with self.app.app_context():
@@ -183,7 +183,7 @@ class PlayerTest(TestCase):
     def setUp(self):
         self.db = models.db
 
-        self.app = create_test_app()
+        self.app = create_app('test')
         self.db.init_app(self.app)
 
         with self.app.app_context():
@@ -221,7 +221,7 @@ class ScoreTest(TestCase):
     def setUp(self):
         self.db = models.db
 
-        self.app = create_test_app()
+        self.app = create_app('test')
         self.db.init_app(self.app)
 
         with self.app.app_context():
