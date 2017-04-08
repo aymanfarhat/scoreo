@@ -1,8 +1,4 @@
 ## Using the API
-###
-
-
-## Using the API
 
 ### Register a new name 
 On the command line where the app is deployed run `flask initgame`, you will be prompted for a game slug and a game secret will be generated. Save those values for using them in your requests.
@@ -93,7 +89,7 @@ Sample reply:
 
 
 
-##Run the server (quick notes)
+## Run the server (quick notes)
 
 `export FLASK_DEBUG=1`
 then
