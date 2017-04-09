@@ -28,7 +28,15 @@ class Player(db.Model):
         player = cls.query.filter(cls.fb_id == fb_id).first()
 
         if player is not None:
+            # when player's token differs from the one stored sync them up
+            # because it might have expired
+
+            if token != player.fb_access_token:
+                player.fb_access_token = token
+                db.session.commit()
+
             result = player
+
         else:
             result = cls(name, fb_id, token)
             db.session.add(result)
@@ -41,19 +49,32 @@ class Player(db.Model):
         return cls.query.filter(cls.fb_id == fb_id).first()
 
     @classmethod
+    def find_by_fb_access_token(cls, fb_access_token):
+        return cls.query.filter(cls.fb_access_token == fb_access_token).first()
+
+    @classmethod
     def create_by_access_token(cls, access_token):
-        playload = {
-            'access_token': access_token,
-            'fields': 'id,name' 
-        }
 
-        r = requests.get('https://graph.facebook.com/me', params=playload)
+        player = cls.find_by_fb_access_token(access_token)
 
-        reply_data = r.json()
+        if player is None:
+            playload = {
+                'access_token': access_token,
+                'fields': 'id,name' 
+            }
 
-        player = cls.first_or_create(reply_data['name'], reply_data['id'], access_token)
+            r = requests.get('https://graph.facebook.com/me', params=playload)
 
-        return player
+            reply_data = r.json()
+
+            if 'error' in reply_data:
+                raise ValueError('Invalid or expired FB Access token')
+            else:
+                player = cls.first_or_create(reply_data['name'], reply_data['id'], access_token)
+
+                return player
+        else:
+            return player
 
 
 class Score(db.Model):
