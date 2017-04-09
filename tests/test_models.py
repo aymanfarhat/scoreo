@@ -139,7 +139,10 @@ class BoardTest(TestCase):
 
         with self.app.app_context():
             game = models.Game.first_or_create('nunu')
-            mode1_board = models.Board.first_or_create('mode1', game)
+            game2 = models.Game.first_or_create('nunu2')
+            mode1_board_game2 = models.Board.first_or_create('mode1', game)
+
+            mode1_board = models.Board.first_or_create('mode1', game2)
             mode2_board = models.Board.first_or_create('mode2', game)
 
             player1 = models.Player.first_or_create('Ayman', '2334', uuid.uuid1())
@@ -148,6 +151,7 @@ class BoardTest(TestCase):
 
             dummy_datetime = datetime(2017, 3, 31, 8, 59, 2, 0)
 
+            models.Score.insert(8000, player3, mode1_board_game2, dummy_datetime)
             models.Score.insert(360, player3, mode1_board, dummy_datetime)
             models.Score.insert(380, player3, mode1_board, dummy_datetime)
             models.Score.insert(400, player2, mode1_board, dummy_datetime)

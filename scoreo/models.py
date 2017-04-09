@@ -112,7 +112,7 @@ class Score(db.Model):
 
 class Board(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    slug = db.Column(db.String(80), unique=True, nullable=False)
+    slug = db.Column(db.String(80), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
@@ -138,7 +138,9 @@ class Board(db.Model):
 
     @classmethod
     def first_or_create(cls, slug, game):
-        board = cls.query.filter(cls.slug == slug and cls.game == game).first()
+        board = db.session.query(Board).filter_by(slug=slug) \
+                    .filter_by(game_id=game.id) \
+                    .first()
 
         if board is not None:
             result = board
@@ -167,13 +169,15 @@ class Board(db.Model):
         return [{'score': r[0], 'created_at': r[1]} for r in board_scores]
 
 
-    def get_topn_scores(self, limit=10, sort_order='DESC'):
+    def get_topn_scores(self, limit=100, sort_order='DESC'):
         """Returns top n scores by a board id"""
 
         sort_funcs = {
             'DESC': desc,
             'ASC': asc
         }
+        
+        print(self.id)
 
         board_scores = db.session.query(func.max(Score.value), Score.created_at, Player.name, Player.fb_id) \
                         .filter_by(board_id=self.id) \
